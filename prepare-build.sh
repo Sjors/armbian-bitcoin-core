@@ -71,9 +71,9 @@ if [ "$GUI" -eq "0" ]; then
     git checkout $1
     pushd depends
       if [ "$BIT32" -eq "1" ]; then
-        make HOST=arm-linux-gnueabihf NO_WALLET=1 NO_UPNP=1 NO_QT=1 -j5
+        make HOST=arm-linux-gnueabihf NO_WALLET=1 NO_UPNP=1 NO_QT=1 #-j5
       else
-        make HOST=aarch64-linux-gnu NO_WALLET=1 NO_UPNP=1 NO_QT=1 -j5
+        make HOST=aarch64-linux-gnu NO_WALLET=1 NO_UPNP=1 NO_QT=1 #-j5
       fi
     popd
     ./autogen.sh
@@ -82,7 +82,7 @@ if [ "$GUI" -eq "0" ]; then
     else
       ./configure --disable-bench --disable-tests --prefix=$PWD/depends/aarch64-linux-gnu --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
     fi
-    make -j5 # use -j flag
+    make # use -j flag
   popd
 fi
 

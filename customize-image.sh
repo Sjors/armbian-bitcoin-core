@@ -46,7 +46,7 @@ else
     ./autogen.sh
     export BDB_PREFIX='/usr/local/src/bitcoin/db4'
     ./configure BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx-4.8" BDB_CFLAGS="-I${BDB_PREFIX}/include" --disable-tests --disable-bench --with-qrencode --with-gui=qt5  
-    make -j5 # TODO: configureable
+    make # TODO: configureable -j
 EOF
 fi
 
