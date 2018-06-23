@@ -94,7 +94,15 @@ git clone https://github.com/armbian/build.git
 
 mkdir -p build/userpatches/overlay/bin
 cp armbian-bitcoin-core/customize-image.sh build/userpatches
+cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches
 cp armbian-bitcoin-core/lib.config build/userpatches
+
+
+if [ "$LIGHTNING" -eq "c" ]; then
+  echo "\nPACKAGE_LIST_ADDITIONAL=\"$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev\"" >> build/userpatches/lib.config
+  
+  echo "./compile-c-lightning.sh" >> build/userpatches/customize-image.sh
+fi
 
 # Copy bitcoind to the right place, if cross compiled:
 

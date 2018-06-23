@@ -36,12 +36,10 @@ if [ "$BUILD_DESKTOP" -eq "0" ]; then
   sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
 else
   sudo -s <<'EOF'
-    mkdir /usr/local/src
     git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
     cd /usr/local/src/bitcoin
     git checkout v0.16.1
     # TODO: check signature commit hash
-    # TODO: check if desktop support was requested
     # TODO: use depends system
     ./contrib/install_db4.sh `pwd`
     cd /usr/local/src/bitcoin
