@@ -111,93 +111,33 @@ ls ~/shared/bitcoin
 # blocks chainstate
 ```
 
-## Cross compile Bitcoin Core
+## Prepare and start Armbian build
 
-If you do not need desktop support, use cross-compilation:
-
-We need to cross-compile Bitcoin Core and C-Lightning, because it's too slow to
-do this during customize-image.
+The `prepare-build.sh` script in this repository takes care of cross-compiling
+Bitcoin Core (if you're not using desktop) and starting the Armbian build process.
 
 ```sh
-sudo apt-get install automake autotools-dev libtool g++-aarch64-linux-gnu \
-                     g++-arm-linux-gnueabihf pkg-config ccache
-
-mkdir src
-git clone https://github.com/bitcoin/bitcoin.git src/bitcoin
-
-# TODO: reuse install code between AWS and Armbian (with compile or fetch binary flag)
-
-pushd src/bitcoin
-  git checkout v0.16.1rc2
-  pushd depends
-    # TODO: check if 32 or 64 bit is required
-    make HOST=arm-linux-gnueabihf NO_WALLET=1 NO_UPNP=1 NO_QT=1 -j5
-    # make HOST=aarch64-linux-gnu NO_WALLET=1 NO_UPNP=1 NO_QT=1 -j5
-  popd
-  ./autogen.sh
-  # TODO: check if 32 or 64 bit is required
-  ./configure --disable-bench --disable-tests --prefix=$PWD/depends/arm-linux-gnueabihf --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
-  # ./configure --disable-bench --disable-tests --prefix=$PWD/depends/aarch64-linux-gnu --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
-  # TODO: get CPU count and memory
-  make -j5 
-popd
+$ mkdir src
+$ git clone https://github.com/Sjors/armbian-bitcoin-core.git src/armbian-bitcoin-core
+$ src/armbian-bitcoin-core/prepare-build.sh -h
+Usage: ./src/armbian-bitcoin-core/prepare-build.sh [options] tag
+options:
+-h   Print this message
+-b   32 bit (instead of default 64 bit)
+-g   Build GUI (QT)
+-d   Use depends
+-l   Add c-lightning
 ```
 
-## Compile Bitcoin QT
-
-If you need desktop support, cross-compilation won't work, see  https://github.com/bitcoin/bitcoin/issues/13495.
-
-`customize-image.sh` takes care of compilation in that case.
-
-## Armbian
-
-Clone the Armbian repo and the scripts here:
-
-```
-git clone https://github.com/Sjors/armbian-bitcoin-core.git
-```
-
-Copy the custom build scripts to the right place:
+To build Bitcoin Core 0.16 without GUI, for a 32 bit device, with lightning:
 
 ```sh
-mkdir -p build/userpatches/overlay/bin
-cp armbian-bitcoin-core/customize-image.sh build/userpatches
-cp armbian-bitcoin-core/lib.config build/userpatches
+./src/armbian-bitcoin-core/previous_release.sh -b -l v0.16.1
 ```
-
-Copy bitcoind to the right place, if you used cross compilation:
-
-```sh
-cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
-```
-
-Copy block index and chainstate:
-
-```sh
-mkdir ~/build/userpatches/overlay/bitcoin
-# mkdir ~/build/userpatches/overlay/bitcoin/testnet3
-cp -r ~/shared/bitcoin/blocks ~/build/userpatches/overlay/bitcoin
-# cp -r ~/shared/bitcoin/testnet3/blocks ~/build/userpatches/overlay/bitcoin/testnet3
-cp -r ~/shared/bitcoin/chainstate ~/build/userpatches/overlay/bitcoin
-# cp -r ~/shared/bitcoin/testnet3/chainstate ~/build/userpatches/overlay/bitcoin/testnet3
-```
-
-Create an SSH key if you don't have one already and then copy `~/.ssh/id_rsa.pub`
-to the shared folder. If present, your pi will only be accessible via SSH using that
-key, whereas password login will only work if you have physical access to the device.
-              
-### Start Armbian build
-
-```sh
-cd build
-# ./compile.sh RELEASE=bionic BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
-./compile.sh RELEASE=xenial BUILD_DESKTOP=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
-```
-
-Use bionic and set BUILD_DESKTOP=no if you don't need desktop support.
 
 After some initial work, it will ask you to select your board. Select 
-Mainline for the kernel if you don't need desktop support, otherwise select legacy.
+Mainline for the kernel, unless you need desktop support and you need a legacy
+kernel for that to work (e.g. for Orange Pi Plus 2E).
 
 Sit back and wait... If all goes well, it should output something like:
 

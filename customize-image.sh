@@ -32,25 +32,25 @@ EOF
 # TODO copy ssh pubkey if found, disable password SSH login
 
 # Install Bitcoin Core
-# TODO: use cross compilation, see https://github.com/bitcoin/bitcoin/issues/13495
-# sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
-
-sudo -s <<'EOF'
-  mkdir /usr/local/src
-  git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
-  cd /usr/local/src/bitcoin
-  git checkout v0.16.1
-  # TODO: check signature commit hash
-  # TODO: check if desktop support was requested
-  # TODO: use depends system
-  ./contrib/install_db4.sh `pwd`
-  cd /usr/local/src/bitcoin
-  ./autogen.sh
-  export BDB_PREFIX='/usr/local/src/bitcoin/db4'
-  ./configure BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx-4.8" BDB_CFLAGS="-I${BDB_PREFIX}/include" --disable-tests --disable-bench --with-qrencode --with-gui=qt5  
-  make -j5 # TODO: configureable
+if [ "$BUILD_DESKTOP" -eq "0" ]; then
+  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
+else
+  sudo -s <<'EOF'
+    mkdir /usr/local/src
+    git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
+    cd /usr/local/src/bitcoin
+    git checkout v0.16.1
+    # TODO: check signature commit hash
+    # TODO: check if desktop support was requested
+    # TODO: use depends system
+    ./contrib/install_db4.sh `pwd`
+    cd /usr/local/src/bitcoin
+    ./autogen.sh
+    export BDB_PREFIX='/usr/local/src/bitcoin/db4'
+    ./configure BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx-4.8" BDB_CFLAGS="-I${BDB_PREFIX}/include" --disable-tests --disable-bench --with-qrencode --with-gui=qt5  
+    make -j5 # TODO: configureable
 EOF
-
+fi
 
 # Configure Bitcoin Core:
 sudo -s <<'EOF'
