@@ -111,6 +111,13 @@ mv /home/armbian/build/output/images/Armbian*.img ~/shared
 
 You can shut the VM down now.
 
+If it's been a while since you copied the blockchain, you can continue syncing it
+on the virtual machine:
+
+```sh
+./armbian-bitcoin-core/sync-chain.sh
+```
+
 ## Prepare bootable microSD card
 
 Use [Etcher](https://etcher.io) to put the resulting `.img` file on the SD card.
