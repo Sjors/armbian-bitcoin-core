@@ -180,13 +180,14 @@ if [ "$GUI" -eq "0" ]; then
   cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
 fi
 
+rm -rf build/userpatches/overlay/bitcoin
 # Copy block index and chainstate:
 mkdir -p build/userpatches/overlay/bitcoin
-# mkdir ~/build/userpatches/overlay/bitcoin/testnet3
-cp -r $BITCOIN_DATADIR/blocks ~/build/userpatches/overlay/bitcoin
-# cp -r $BITCOIN_DATADIR/testnet3/blocks ~/build/userpatches/overlay/bitcoin/testnet3
-cp -r $BITCOIN_DATADIR/chainstate ~/build/userpatches/overlay/bitcoin
-# cp -r $BITCOIN_DATADIR/testnet3/chainstate ~/build/userpatches/overlay/bitcoin/testnet3
+# mkdir build/userpatches/overlay/bitcoin/testnet3
+cp -r $BITCOIN_DATADIR/blocks build/userpatches/overlay/bitcoin
+# cp -r $BITCOIN_DATADIR/testnet3/blocks build/userpatches/overlay/bitcoin/testnet3
+cp -r $BITCOIN_DATADIR/chainstate build/userpatches/overlay/bitcoin
+# cp -r $BITCOIN_DATADIR/testnet3/chainstate build/userpatches/overlay/bitcoin/testnet3
 
 pushd build
   if [ "$GUI" -eq "0" ]; then
