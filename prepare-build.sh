@@ -93,8 +93,6 @@ if ! lsmod | grep vboxguest ; then
   if [ ! -d /media/cdrom ]; then
     sudo mkdir --p /media/cdrom
     sudo mount -t auto /dev/cdrom /media/cdrom/
-    cd /media/cdrom/
-    sudo sh VBoxLinuxAdditions.run
     sudo /media/cdrom/./VBoxLinuxAdditions.run
   fi
 
