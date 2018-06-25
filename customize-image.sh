@@ -64,11 +64,11 @@ sudo -s <<'EOF'
   # mkdir /home/bitcoin/.bitcoin/testnet3
 
   # Copy block index and chain state from host:
-  cp -r /tmp/overlay/chainstate /home/bitcoin/.bitcoin
-  cp -r /tmp/overlay/blocks /home/bitcoin/.bitcoin
+  cp -r /tmp/overlay/bitcoin/chainstate /home/bitcoin/.bitcoin
+  cp -r /tmp/overlay/bitcoin/blocks /home/bitcoin/.bitcoin
   
-  # cp -r /tmp/overlay/testnet3/chainstate /home/bitcoin/.bitcoin/testnet3
-  # cp -r /tmp/overlay/testnet3/blocks /home/bitcoin/.bitcoin/testnet3
+  # cp -r /tmp/overlay/bitcoin/testnet3/chainstate /home/bitcoin/.bitcoin/testnet3
+  # cp -r /tmp/overlay/bitcoin/testnet3/blocks /home/bitcoin/.bitcoin/testnet3
 
   chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
 EOF
