@@ -25,14 +25,14 @@ sudo -s <<'EOF'
   # User with sudo rights and initial password:
   useradd bitcoin -m -s /bin/bash --groups sudo
   echo "bitcoin:bitcoin" | chpasswd
-  passwd -e pi
-  echo "bitcoin ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/pi
+  passwd -e bitcoin
+  echo "bitcoin ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/bitcoin
 EOF
 
 # TODO copy ssh pubkey if found, disable password SSH login
 
 # Install Bitcoin Core
-if [ "$BUILD_DESKTOP" -eq "0" ]; then
+if [ "$BUILD_DESKTOP" == "no" ]; then
   sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
 else
   sudo -s <<'EOF'
@@ -59,13 +59,14 @@ sudo -s <<'EOF'
   echo "maxuploadtarget=100" >> /home/bitcoin/.bitcoin/bitcoin.conf
   
   # TODO: offer choice between mainnet and testnet
-  echo "testnet=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
+  # echo "testnet=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
+  # mkdir /home/bitcoin/.bitcoin/testnet3
 
   # Copy block index and chain state from host:
-  # mkdir /home/bitcoin/.bitcoin/testnet3
-  # cp -r /tmp/overlay/chainstate /home/bitcoin/.bitcoin
+  cp -r /tmp/overlay/chainstate /home/bitcoin/.bitcoin
+  cp -r /tmp/overlay/blocks /home/bitcoin/.bitcoin
+  
   # cp -r /tmp/overlay/testnet3/chainstate /home/bitcoin/.bitcoin/testnet3
-  # cp -r /tmp/overlay/blocks /home/bitcoin/.bitcoin
   # cp -r /tmp/overlay/testnet3/blocks /home/bitcoin/.bitcoin/testnet3
 
   chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin

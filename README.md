@@ -63,64 +63,20 @@ folder you just created, enter `shared` as the name and check the auto mount box
 Once the installation is complete, it should reboot the VM and you should see a
 login prompt. Use the password you entered earlier.
 
-Click on the VM window and then select Insert Guest Editions CD from the Devices menu.
-
-TODO: put most of the below in a script, split between prep and (re)build.
-
-Get Ubuntu up to date:
-
-```
-sudo apt-get update
-sudo apt-get upgrade
-```
-
-To install the Guest Editions:
-
-```
-sudo apt-get install build-essential linux-headers-`uname -r`
-sudo /media/cdrom/./VBoxLinuxAdditions.run
-```
-
-If for some reason after inserting guest editions `/media/cdrom` doesn't exist, try:
-
-```
-sudo mkdir --p /media/cdrom
-sudo mount -t auto /dev/cdrom /media/cdrom/
-cd /media/cdrom/
-sudo sh VBoxLinuxAdditions.run
-```
-
-Then reboot: `sudo reboot`
-
-
-Mount the shared drive with the correct permissions:
-
-```sh
-export USER_ID=`id -u`
-export GROUP_ID=`id -g`
-mkdir ~/shared
-sudo mount -t vboxsf -o umask=0022,gid=$GROUP_ID,uid=$USER_ID shared ~/shared
-```
-
-Make sure everything is there:
-
-```sh
-ls ~/shared
-# bitcoin
-ls ~/shared/bitcoin
-# blocks chainstate
-```
-
 ## Prepare and start Armbian build
+
+Click on the VM window and then select Insert Guest Editions CD from the Devices menu.
 
 The `prepare-build.sh` script in this repository takes care of cross-compiling
 Bitcoin Core (if you're not using desktop) and starting the Armbian build process.
 
+If needed, it will install the Guest Editions and ask you to reboot: `sudo reboot`.
+
 ```sh
 $ mkdir src
-$ git clone https://github.com/Sjors/armbian-bitcoin-core.git src/armbian-bitcoin-core
-$ src/armbian-bitcoin-core/prepare-build.sh -h
-Usage: ./src/armbian-bitcoin-core/prepare-build.sh [options] tag
+$ git clone https://github.com/Sjors/armbian-bitcoin-core.git
+$ ./armbian-bitcoin-core/prepare-build.sh -h
+Usage: ./armbian-bitcoin-core/prepare-build.sh [options] tag
 options:
 -h   Print this message
 -b   32 bit (instead of default 64 bit)
@@ -132,7 +88,7 @@ options:
 To build Bitcoin Core 0.16 without GUI, for a 32 bit device, with lightning:
 
 ```sh
-./src/armbian-bitcoin-core/previous_release.sh -b -l v0.16.1
+./armbian-bitcoin-core/previous_release.sh -b -l v0.16.1
 ```
 
 After some initial work, it will ask you to select your board. Select 
