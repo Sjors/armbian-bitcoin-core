@@ -2,31 +2,41 @@
 CONFIG_FLAGS=" --disable-tests --disable-bench --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++"
 USE_DEPENDS=0
 GUI=0
-BIT32=0
+BITS=64
 LIGHTNING=
 BITCOIN_DATADIR=shared/bitcoin
 PREBUILT_BITCOIN_CORE=0
 PARALLEL=1
+ARMBIAN_CLEAN_LEVEL=make,debs
+UBUNTU=bionic
 
-while getopts ":hgdbpj:" opt; do
+while getopts ":hcgdl:b:pj:u:" opt; do
   case $opt in
     h)
       echo "Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag"
       echo "  options:"
-      echo "  -h   Print this message"
-      echo "  -b   32 bit (instead of default 64 bit)"
-      echo "  -g   Build GUI (QT)"
-      echo "  -j   Number of parallel threads to use during build (each needs ~1.5 GB RAM)"
+      echo "  -h     Print this message"
+      echo "  -b     Bits: 32 or 64 (default)"
+      echo "  -g     Build GUI (QT)"
+      echo "  -j     Number of parallel threads to use during build (each needs ~1.5 GB RAM)"
       # echo "  -t   Use testnet" # TODO
       # echo "  -..." override bitcoin datadir
-      echo "  -d   Use depends"
-      echo "  -l   Add c-lightning"
-      echo "  -p   Use pre-built bitcoin core binaries in src/bitcoin"
-      echo "  -c   Clean"
+      # echo "  -d     Use depends"
+      echo "  -l [c] Add lightning: c (c-lightning)"
+      echo "  -p     Use pre-built bitcoin core binaries in src/bitcoin"
+      echo "  -c     Clean"
+      echo "  -u     Ubuntu release: bionic (18.04, default), xenial (16.04)"
       exit 0
       ;;
     b)
-      BIT32=1
+      if [ $OPTARG == "32" ]; then
+        BITS=32
+      elif [ $OPTARG == "64" ]; then
+        BITS=64
+      else
+        echo "Bits should be 32 or 64"
+        exit 1
+      fi
       ;;
     g)
       GUI=1
@@ -35,7 +45,12 @@ while getopts ":hgdbpj:" opt; do
       USE_DEPENDS=1
       ;;
     l)
-      LIGHTNING=c
+      if [ $OPTARG == "c" ]; then
+        LIGHTNING=c
+      else
+        echo "Invalid choice for Lightning: $OPTARG (use 'c')"
+        exit 1
+      fi
       ;;
     p)
       PREBUILT_BITCOIN_CORE=1
@@ -44,8 +59,8 @@ while getopts ":hgdbpj:" opt; do
       PARALLEL=$OPTARG
       ;;
     c)
-      if [ ! -d src/bitcoin ]; then
-      echo "Clean bitcoin dir..."
+      if [ -d src/bitcoin ]; then
+      echo "Cleaning bitcoin dir..."
         pushd src/bitcoin
           make distclean
           pushd depends
@@ -54,7 +69,20 @@ while getopts ":hgdbpj:" opt; do
           popd
         popd
       fi
-      exit 0  
+      if [ -d build ]; then
+        echo "Telling Armbian to clean more..."
+        ARMBIAN_CLEAN_LEVEL=make,alldebs,cache,extras # ,sources
+      fi
+      ;;
+    u)
+      if [ $OPTARG == "bionic" ]; then
+        UBUNTU=bionic
+      elif [ $OPTARG == "xenial" ]; then
+        UBUNTU=xenial
+      else
+        echo "Ubuntu should be '-u bionic' or '-u xenial'"
+        exit 1
+      fi
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -80,7 +108,6 @@ fi
 
 echo "If asked, tnter your sudo password in order to upgrade your system, install dependencies and mount shared folder..."
 sudo apt-get update
-sudo apt-get dist-upgrade
 
 echo "Installing dependencies..."
 sudo apt-get install -y automake autotools-dev libtool g++-aarch64-linux-gnu \
@@ -123,14 +150,14 @@ if [ "$PREBUILT_BITCOIN_CORE" -eq "0" ]; then
       git reset --hard
       git checkout $1
       pushd depends
-        if [ "$BIT32" -eq "1" ]; then
+        if [ "$BITS" -eq "32" ]; then
           make HOST=arm-linux-gnueabihf NO_QT=1 -j$PARALLEL
         else
           make HOST=aarch64-linux-gnu NO_QT=1 -j$PARALLEL
         fi
       popd
       ./autogen.sh
-      if [ "$BIT32" -eq "1" ]; then
+      if [ "$BITS" -eq "32" ]; then
         ./configure $CONFIG_FLAGS --prefix=$PWD/depends/arm-linux-gnueabihf
       else
         ./configure $CONFIG_FLAGS --prefix=$PWD/depends/aarch64-linux-gnu
@@ -140,18 +167,20 @@ if [ "$PREBUILT_BITCOIN_CORE" -eq "0" ]; then
   fi
 fi
 
-echo "Check if bitcoin binaries are present..."
 if [ "$GUI" -eq "0" ]; then
+  echo "Check if bitcoin binaries are present..."
   FILES="bitcoin-cli bitcoind"
+  
+  for f in $FILES;
+  do
+    if [ ! -f src/bitcoin/src/$f ]; then
+      echo "Could not find $f in src/bitcoin/src"
+      exit 1
+    fi
+  done
 fi
 
-for f in $FILES;
-do
-  if [ ! -f src/bitcoin/src/$f ]; then
-    echo "Could not find $f in src/bitcoin/src"
-    exit 1
-  fi
-done
+
 
 # TODO: can't cross compile c-lightning yet
 # if [ "$LIGHTNING" -eq "c" ]; then
@@ -160,16 +189,17 @@ if [ ! -d build ]; then
   echo "Cloning Armbian and adding patches..."
   git clone https://github.com/armbian/build.git
   mkdir -p build/userpatches/overlay/bin
-  cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches
-  cp armbian-bitcoin-core/lib.config build/userpatches
+  mkdir -p build/userpatches/overlay/scripts
 fi
 
 cp armbian-bitcoin-core/customize-image.sh build/userpatches
+cp armbian-bitcoin-core/lib.config build/userpatches
+cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches/overlay/scripts
 
 if [ "$LIGHTNING" == "c" ]; then
-  echo "\nPACKAGE_LIST_ADDITIONAL=\"$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev\"" >> build/userpatches/lib.config
+  echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev"' >> build/userpatches/lib.config
   
-  echo "./compile-c-lightning.sh" >> build/userpatches/customize-image.sh
+  echo "./tmp/overlay/scripts/build-c-lightning.sh" >> build/userpatches/customize-image.sh
 fi
 
 # Copy bitcoind to the right place, if cross compiled:
@@ -189,8 +219,9 @@ cp -r $BITCOIN_DATADIR/chainstate build/userpatches/overlay/bitcoin
 
 pushd build
   if [ "$GUI" -eq "0" ]; then
-    ./compile.sh RELEASE=bionic BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
+    BUILD_DESKTOP=no
   else
-    ./compile.sh RELEASE=xenial BUILD_DESKTOP=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
+    BUILD_DESKTOP=yes
   fi
+  ./compile.sh CLEAN_LEVEL=$ARMBIAN_CLEAN_LEVEL RELEASE=$UBUNTU BUILD_DESKTOP=$BUILD_DESKTOP KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
 popd
