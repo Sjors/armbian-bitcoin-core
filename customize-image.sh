@@ -19,13 +19,9 @@ BUILD_DESKTOP=$4
 # TODO: exit with non-zero status if anything goes wrong
 
 sudo -s <<'EOF'  
-  # Disable root login
-  passwd -l root
-
   # User with sudo rights and initial password:
   useradd bitcoin -m -s /bin/bash --groups sudo
   echo "bitcoin:bitcoin" | chpasswd
-  passwd -e bitcoin
   echo "bitcoin ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/bitcoin
 EOF
 
@@ -40,12 +36,19 @@ else
     cd /usr/local/src/bitcoin
     git checkout v0.16.1
     # TODO: check signature commit hash
-    # TODO: use depends system
-    ./contrib/install_db4.sh `pwd`
+
+    sudo add-apt-repository ppa:bitcoin/bitcoin
+    sudo apt-get update
+    sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
+    # apt enters a confused state, perform incantation and try again:
+    sudo apt-get -y -f install
+    sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
+
     cd /usr/local/src/bitcoin
     ./autogen.sh
-    export BDB_PREFIX='/usr/local/src/bitcoin/db4'
-    ./configure BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx-4.8" BDB_CFLAGS="-I${BDB_PREFIX}/include" --disable-tests --disable-bench --with-qrencode --with-gui=qt5  
+    if ! ./configure --disable-tests --disable-bench --with-qrencode --with-gui=qt5 ; then
+      exit 1
+    fi
     make
     sudo make install
 EOF
@@ -71,4 +74,12 @@ sudo -s <<'EOF'
   # cp -r /tmp/overlay/bitcoin/testnet3/blocks /home/bitcoin/.bitcoin/testnet3
 
   chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
+EOF
+
+sudo -s <<'EOF'  
+  # Disable root login
+  passwd -l root
+  
+  # Require password reset:
+  passwd -e bitcoin
 EOF
