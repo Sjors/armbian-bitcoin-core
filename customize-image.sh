@@ -58,6 +58,7 @@ fi
 sudo -s <<'EOF'
   mkdir /home/bitcoin/.bitcoin
   # TODO: get GB RAM from $BOARD or user input (menu?)
+  echo "server=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
   echo "prune=2000" >> /home/bitcoin/.bitcoin/bitcoin.conf
   echo "peerbloomfilters=0" >> /home/bitcoin/.bitcoin/bitcoin.conf
   echo "maxuploadtarget=100" >> /home/bitcoin/.bitcoin/bitcoin.conf
