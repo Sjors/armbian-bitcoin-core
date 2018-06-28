@@ -77,13 +77,16 @@ If needed, it will install the Guest Editions and ask you to reboot: `sudo reboo
 $ mkdir src
 $ git clone https://github.com/Sjors/armbian-bitcoin-core.git
 $ ./armbian-bitcoin-core/prepare-build.sh -h
-Usage: ./armbian-bitcoin-core/prepare-build.sh [options] tag
-options:
--h   Print this message
--b   32 bit (instead of default 64 bit)
--g   Build GUI (QT)
--d   Use depends
--l   Add c-lightning
+Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag
+  options:
+  -h     Print this message
+  -b     Bits: 32 or 64 (default)
+  -g     Build GUI (QT)
+  -j     Number of parallel threads to use during build (each needs ~1.5 GB RAM)
+  -l [c] Add lightning: c (c-lightning)
+  -p     Use pre-built bitcoin core binaries in src/bitcoin
+  -c     Clean
+  -u     Ubuntu release: bionic (18.04, default), xenial (16.04)
 ```
 
 To build Bitcoin Core 0.16 without GUI, for a 32 bit device and with lightning:
