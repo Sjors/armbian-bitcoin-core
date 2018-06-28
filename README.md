@@ -55,6 +55,7 @@ for installing the VM, which some changes:
   * Ubuntu doesn't enable SSH by default, so type `sudo apt-get install shh` after installation
 * the Ubuntu installer is pretty similar to the Debian one shown on that page (when in doubt, press enter) 
   * it skips the root user stuff, so you just need to create a single password
+  * be sure to set the language and timezone; this will be copied to your device
 
 Go to the settings page of
 your virtual machine, to the Shared Folders tab. Click the + button, find the
