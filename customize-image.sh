@@ -76,6 +76,22 @@ sudo -s <<'EOF'
   chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
 EOF
 
+if [ "$BUILD_DESKTOP" == "yes" ]; then
+  # Bitcoin desktop background and icon:
+  sudo -s <<'EOF'
+    cp /tmp/overlay/rocket.jpg /usr/share/backgrounds/xfce/rocket.jpg
+    mkdir -p /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml
+    cp /tmp/overlay/xfce4-desktop.xml /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+    cp /tmp/overlay/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
+    mkdir -p /home/bitcoin/Desktop
+    cp /usr/local/src/bitcoin/contrib/debian/bitcoin-qt.desktop /home/bitcoin/Desktop
+    chmod +x /home/bitcoin/Desktop/bitcoin-qt.desktop
+    chown -R bitcoin:bitcoin /home/bitcoin/Desktop
+    cp /usr/local/src/bitcoin/share/pixmaps/bitcoin128.png /usr/share/pixmaps
+    cp /usr/local/src/bitcoin/share/pixmaps/bitcoin256.png /usr/share/pixmaps
+EOF
+fi
+
 sudo -s <<'EOF'  
   # Disable root login
   passwd -l root

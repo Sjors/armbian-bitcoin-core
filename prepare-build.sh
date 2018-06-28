@@ -196,11 +196,26 @@ cp armbian-bitcoin-core/customize-image.sh build/userpatches
 cp armbian-bitcoin-core/lib.config build/userpatches
 cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches/overlay/scripts
 
+if [ "$GUI" -eq "1" ]; then
+  # TODO: try using "DISPLAY_MANAGER=lightdm" option in build/lib/configuration.sh
+  echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL lightdm  lightdm-gtk-greeter"' >> build/userpatches/lib.config
+  echo "sudo systemctl enable lightdm" >> build/userpatches/customize-image.sh
+  echo "sudo dpkg-reconfigure lightdm" >> build/userpatches/customize-image.sh
+  
+  # Use Rocket wallapper from https://flic.kr/p/221H7xu, get rid of second workspsace
+  # and use slightly larger icon:
+  cp armbian-bitcoin-core/rocket.jpg build/userpatches/overlay
+  cp armbian-bitcoin-core/xfce4-desktop.xml build/userpatches/overlay
+  cp armbian-bitcoin-core/lightdm-gtk-greeter.conf build/userpatches/overlay
+fi
+
 if [ "$LIGHTNING" == "c" ]; then
   echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev"' >> build/userpatches/lib.config
   
   echo "./tmp/overlay/scripts/build-c-lightning.sh" >> build/userpatches/customize-image.sh
 fi
+
+
 
 # Copy bitcoind to the right place, if cross compiled:
 
