@@ -27,12 +27,15 @@ while sleep 60
 do
   if BLOCKHEIGHT=`bitcoin-cli $OPTS getblockchaininfo | jq '.blocks'`; then
     if bitcoin-cli $OPTS getblockchaininfo | jq -e '.initialblockdownload==false'; then
-      echo "Caught up, pruning to height $BLOCKHEIGHT..."
+      echo "Almost caught up, wait 15 minutes..."
+      sleep 900
+      BLOCKHEIGHT=`bitcoin-cli $OPTS getblockchaininfo | jq '.blocks'`
+      echo "Pruning to height $BLOCKHEIGHT..."
       bitcoin-cli $OPTS pruneblockchain $BLOCKHEIGHT
       bitcoin-cli $OPTS stop
       while sleep 10 
       do # Wait for shutdown
-        if [ ! -f /home/bitcoin/big-disk/bitcoind.pid ] && [ ! -f /home/bitcoin/big-disk/testnet3/bitcoind.pid ]; then
+        if [ ! -f ~/.bitcoin/bitcoind.pid ] && [ ! -f ~/.bitcoin/testnet3/bitcoind.pid ]; then
           break
         fi
       done
