@@ -34,10 +34,7 @@ when it asks, also install the guest extensions. The latter lets you share a fol
 between your computer and the VM.
 
 Armbian is picky about which Ubuntu version you use, so we'll use Ubuntu 18.04 Bionic
-both for the virtual machine as well as the device. If that doesn't work for some reason,
-the instructions below and all scripts most likely also work for Ubuntu 16.04 Xenial.
-
-If you already use Ubuntu 18.04 then of course you won't need the virtual machine,
+both for the virtual machine as well as the device. If you already use Ubuntu 18.04 then of course you won't need the virtual machine,
 though if you run into strange errors, it might be worth trying.
 
 Download the [Ubuntu Server installer](https://www.ubuntu.com/download/server).
@@ -96,8 +93,7 @@ To build Bitcoin Core 0.16 without GUI, for a 32 bit device and with lightning:
 ```
 
 After some initial work, it will ask you to select your board. Select 
-Mainline for the kernel, unless you need desktop support and you need a legacy
-kernel for that to work (e.g. for Orange Pi Plus 2E).
+Mainline for the kernel.
 
 Sit back and wait... If all goes well, it should output something like:
 
