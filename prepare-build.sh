@@ -13,7 +13,7 @@ UBUNTU=bionic
 while getopts ":hcgdl:b:pj:u:" opt; do
   case $opt in
     h)
-      echo "Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag"
+      echo "Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options]"
       echo "  options:"
       echo "  -h     Print this message"
       echo "  -b     Bits: 32 or 64 (default)"
@@ -97,13 +97,6 @@ done
 
 shift $((OPTIND-1))
 
-if [ "$PREBUILT_BITCOIN_CORE" -eq "0" ]; then
-  if [ -z "$1" ]; then
-    echo "Specify release tag, e.g.: .previous_release v0.15.1"
-    exit 1
-  fi
-fi
-
 # TODO: skip stuff if it's already done
 
 echo "If asked, tnter your sudo password in order to upgrade your system, install dependencies and mount shared folder..."
@@ -137,21 +130,30 @@ fi
 
 # TODO: check ~/shared/bitcoin/blocks and ~/shared/bitcoin/chainstate exist
 
-# Can't cross compile with GUI, so compilation happens in customize-image.sh
+# Cross compile for the GUI only works for 32 bit ARM at the moment. For 64 bit
+# platforms, compilation happens in customize-image.sh
 # https://github.com/bitcoin/bitcoin/issues/13495.
-# if [ "$GUI" -eq "0" ]; then
 
 if [ "$PREBUILT_BITCOIN_CORE" -eq "0" ]; then
-  if [ "$GUI" -eq "0" ]; then
+  if [ "$GUI" -eq "0" ] || [ "$BITS" -eq "32" ]; then
     if [ ! -d src/bitcoin ]; then
       git clone https://github.com/bitcoin/bitcoin.git src/bitcoin
     fi
     pushd src/bitcoin
       git reset --hard
-      git checkout $1
+      git checkout v0.16.1
+      if [ "$GUI" -eq "1" ] && [ "$BITS" -eq "32" ]; then
+        # Use master for ARM QT cross-compile support:
+        # TODO: switch to 0.17 (RC) release tag
+        git checkout master
+      fi
       pushd depends
         if [ "$BITS" -eq "32" ]; then
-          make HOST=arm-linux-gnueabihf NO_QT=1 -j$PARALLEL
+          if [ "$GUI" -eq "1" ]; then
+            make HOST=arm-linux-gnueabihf -j$PARALLEL
+          else
+            make HOST=arm-linux-gnueabihf NO_QT=1 -j$PARALLEL
+          fi
         else
           make HOST=aarch64-linux-gnu NO_QT=1 -j$PARALLEL
         fi
@@ -206,6 +208,11 @@ if [ "$GUI" -eq "1" ]; then
   cp armbian-bitcoin-core/lightdm-gtk-greeter.conf build/userpatches/overlay
 fi
 
+if [ "$GUI" -eq "0" ] || [ "$BITS" -eq "32" ]; then
+  # Bitcoin Core compilation dependencies:
+  echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils python3 libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev software-properties-common"' >> build/userpatches/lib.config
+fi
+
 if [ "$LIGHTNING" == "c" ]; then
   echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev"' >> build/userpatches/lib.config
   
@@ -218,9 +225,9 @@ mkdir -p build/userpatches/overlay/bitcoin
 cp armbian-bitcoin-core/bitcoin.conf build/userpatches/overlay/bitcoin
 
 # Copy bitcoind to the right place, if cross compiled:
-
-if [ "$GUI" -eq "0" ]; then
-  cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
+cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
+if [ "$GUI" -eq "1" ] && [ "$BITS" -eq "32" ]; then
+  cp src/bitcoin/src/qt/bitcoin-qt build/userpatches/overlay/bin
 fi
 
 # Copy block index and chainstate:

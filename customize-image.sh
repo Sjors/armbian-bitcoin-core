@@ -37,7 +37,6 @@ EOF
 
 
 if [ -f /tmp/overlay/bin/bitcoind ]; then
-# Install Bitcoin Core
   sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
 elif [ "$BUILD_DESKTOP" == "yes" ]; then
   sudo -s <<'EOF'
