@@ -197,11 +197,6 @@ cp armbian-bitcoin-core/lib.config build/userpatches
 cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches/overlay/scripts
 
 if [ "$GUI" -eq "1" ]; then
-  # TODO: try using "DISPLAY_MANAGER=lightdm" option in build/lib/configuration.sh
-  echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL lightdm  lightdm-gtk-greeter"' >> build/userpatches/lib.config
-  echo "sudo systemctl enable lightdm" >> build/userpatches/customize-image.sh
-  echo "sudo dpkg-reconfigure lightdm" >> build/userpatches/customize-image.sh
-  
   # Use Rocket wallapper from https://flic.kr/p/221H7xu, get rid of second workspsace
   # and use slightly larger icon:
   cp armbian-bitcoin-core/rocket.jpg build/userpatches/overlay
@@ -238,5 +233,5 @@ pushd build
   else
     BUILD_DESKTOP=yes
   fi
-  ./compile.sh CLEAN_LEVEL=$ARMBIAN_CLEAN_LEVEL RELEASE=$UBUNTU BUILD_DESKTOP=$BUILD_DESKTOP KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
+  ./compile.sh DISPLAY_MANAGER=lightdm CLEAN_LEVEL=$ARMBIAN_CLEAN_LEVEL RELEASE=$UBUNTU BUILD_DESKTOP=$BUILD_DESKTOP KERNEL_ONLY=no KERNEL_CONFIGURE=no PRIVATE_CCACHE=yes
 popd

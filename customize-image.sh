@@ -90,6 +90,8 @@ if [ "$BUILD_DESKTOP" == "yes" ]; then
     chown -R bitcoin:bitcoin /home/bitcoin/Desktop
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin128.png /usr/share/pixmaps
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin256.png /usr/share/pixmaps
+    sudo dpkg-reconfigure lightdm
+    DISPLAY=:0 xfconf-query -c xfwm4 --property /general/workspace_count --set 1
 EOF
 fi
 
