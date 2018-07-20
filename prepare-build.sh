@@ -212,7 +212,10 @@ if [ "$LIGHTNING" == "c" ]; then
   echo "./tmp/overlay/scripts/build-c-lightning.sh" >> build/userpatches/customize-image.sh
 fi
 
-
+# Copy bitcoin configuration
+rm -rf build/userpatches/overlay/bitcoin
+mkdir -p build/userpatches/overlay/bitcoin
+cp armbian-bitcoin-core/bitcoin.conf build/userpatches/overlay/bitcoin
 
 # Copy bitcoind to the right place, if cross compiled:
 
@@ -220,9 +223,7 @@ if [ "$GUI" -eq "0" ]; then
   cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
 fi
 
-rm -rf build/userpatches/overlay/bitcoin
 # Copy block index and chainstate:
-mkdir -p build/userpatches/overlay/bitcoin
 # mkdir build/userpatches/overlay/bitcoin/testnet3
 cp -r $BITCOIN_DATADIR/blocks build/userpatches/overlay/bitcoin
 # cp -r $BITCOIN_DATADIR/testnet3/blocks build/userpatches/overlay/bitcoin/testnet3

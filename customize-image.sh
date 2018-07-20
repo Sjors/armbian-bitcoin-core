@@ -62,11 +62,7 @@ fi
 sudo -s <<'EOF'
   mkdir /home/bitcoin/.bitcoin
   mkdir /home/bitcoin/.bitcoin/wallets
-  # TODO: get GB RAM from $BOARD or user input (menu?)
-  echo "server=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
-  echo "prune=2000" >> /home/bitcoin/.bitcoin/bitcoin.conf
-  echo "peerbloomfilters=0" >> /home/bitcoin/.bitcoin/bitcoin.conf
-  echo "maxuploadtarget=100" >> /home/bitcoin/.bitcoin/bitcoin.conf
+  cp /tmp/overlay/bitcoin/bitcoin.conf /home/bitcoin/.bitcoin
   
   # TODO: offer choice between mainnet and testnet
   # echo "testnet=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
