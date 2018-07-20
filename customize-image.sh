@@ -78,6 +78,25 @@ sudo -s <<'EOF'
   chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
 EOF
 
+# Install Tor
+sudo -s <<'EOF'
+  su - bitcoin -c "gpg --keyserver pgp.mit.edu --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89"
+  su - bitcoin -c "gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89" | apt-key add -
+cat <<EOT >> /etc/apt/sources.list
+deb https://deb.torproject.org/torproject.org bionic main
+deb-src https://deb.torproject.org/torproject.org bionic main
+EOT
+  apt-get update
+  apt-get install -y tor deb.torproject.org-keyring
+  mkdir -p /usr/share/tor
+cat <<EOT >> /usr/share/tor/tor-service-defaults-torrc
+ControlPort 9051
+CookieAuthentication 1
+CookieAuthFileGroupReadable 1
+EOT
+  usermod -a -G debian-tor bitcoin
+EOF
+
 if [ "$BUILD_DESKTOP" == "yes" ]; then
   # Bitcoin desktop background and icon:
   sudo -s <<'EOF'
