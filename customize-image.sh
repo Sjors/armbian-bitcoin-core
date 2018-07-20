@@ -57,6 +57,7 @@ fi
 # Configure Bitcoin Core:
 sudo -s <<'EOF'
   mkdir /home/bitcoin/.bitcoin
+  mkdir /home/bitcoin/.bitcoin/wallets
   # TODO: get GB RAM from $BOARD or user input (menu?)
   echo "server=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
   echo "prune=2000" >> /home/bitcoin/.bitcoin/bitcoin.conf
