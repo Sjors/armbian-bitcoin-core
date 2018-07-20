@@ -90,6 +90,8 @@ if [ "$BUILD_DESKTOP" == "yes" ]; then
     chown -R bitcoin:bitcoin /home/bitcoin/Desktop
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin128.png /usr/share/pixmaps
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin256.png /usr/share/pixmaps
+    cp /tmp/overlay/scripts/first_boot_desktop.service /etc/systemd/system
+    systemctl enable first_boot_desktop.service
 EOF
 fi
 
