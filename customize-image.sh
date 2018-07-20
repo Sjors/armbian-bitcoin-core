@@ -27,16 +27,20 @@ EOF
 
 # TODO copy ssh pubkey if found, disable password SSH login
 
-# Install Bitcoin Core
-if [ "$BUILD_DESKTOP" == "no" ]; then
-  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
-else
-  sudo -s <<'EOF'
-    git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
-    cd /usr/local/src/bitcoin
-    git checkout v0.16.1
-    # TODO: check signature commit hash
+# Clone Bitcoin Core repo for graphics assets and (if needed) compilation:
+sudo -s <<'EOF'
+  git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
+  cd /usr/local/src/bitcoin
+  git checkout v0.16.1
+  # TODO: check signature commit hash
+EOF
 
+
+if [ -f /tmp/overlay/bin/bitcoind ]; then
+# Install Bitcoin Core
+  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
+elif [ "$BUILD_DESKTOP" == "yes" ]; then
+  sudo -s <<'EOF'
     sudo add-apt-repository ppa:bitcoin/bitcoin
     sudo apt-get update
     sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
@@ -50,7 +54,7 @@ else
       exit 1
     fi
     make
-    sudo make install
+    make install
 EOF
 fi
 
