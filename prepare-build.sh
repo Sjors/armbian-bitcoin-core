@@ -9,8 +9,10 @@ PREBUILT_BITCOIN_CORE=0
 PARALLEL=1
 ARMBIAN_CLEAN_LEVEL=make,debs
 UBUNTU=bionic
+TIMEZONE=UTC
+LOCALE=en_US
 
-while getopts ":hcgdl:b:pj:u:" opt; do
+while getopts ":hcgdl:b:pj:u:t:a:" opt; do
   case $opt in
     h)
       echo "Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag"
@@ -26,6 +28,8 @@ while getopts ":hcgdl:b:pj:u:" opt; do
       echo "  -p     Use pre-built bitcoin core binaries in src/bitcoin"
       echo "  -c     Clean"
       echo "  -u     Ubuntu release: bionic (18.04, default), xenial (16.04)"
+      echo "  -t     Set timezone (e.g. \"Europe/Amsterdam\", default: UTC)"
+      echo "  -a     Set locale (default: en_US)"
       exit 0
       ;;
     b)
@@ -83,6 +87,12 @@ while getopts ":hcgdl:b:pj:u:" opt; do
         echo "Ubuntu should be '-u bionic' or '-u xenial'"
         exit 1
       fi
+      ;;
+    t)
+      TIMEZONE=$OPTARG
+      ;;
+    a)
+      LOCALE=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -195,8 +205,11 @@ fi
 cp armbian-bitcoin-core/customize-image.sh build/userpatches
 cp armbian-bitcoin-core/lib.config build/userpatches
 cp armbian-bitcoin-core/build-c-lightning.sh build/userpatches/overlay/scripts
+cp armbian-bitcoin-core/first_boot.service build/userpatches/overlay/scripts
 cp armbian-bitcoin-core/first_boot_desktop.service build/userpatches/overlay/scripts
 
+sed -i "s:UTC:$TIMEZONE:" build/userpatches/overlay/scripts/first_boot.service
+sed -i "s/en_US/$LOCALE/" build/userpatches/overlay/scripts/first_boot.service
 
 if [ "$GUI" -eq "1" ]; then
   # Use Rocket wallapper from https://flic.kr/p/221H7xu, get rid of second workspsace
@@ -216,6 +229,7 @@ fi
 rm -rf build/userpatches/overlay/bitcoin
 mkdir -p build/userpatches/overlay/bitcoin
 cp armbian-bitcoin-core/bitcoin.conf build/userpatches/overlay/bitcoin
+echo "lang=$LOCALE" >> build/userpatches/overlay/bitcoin/bitcoin.conf
 
 # Copy bitcoind to the right place, if cross compiled:
 

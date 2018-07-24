@@ -1,0 +1,12 @@
+[Unit]
+Description=Modifications for first boot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/timedatectl set-timezone UTC
+ExecStartPost=/usr/sbin/locale-gen en_US.UTF-8
+ExecStartPost=/usr/bin/localectl set-locale LANG=en_US.utf8
+ExecStartPost=/bin/systemctl disable first_boot.service
+
+[Install]
+WantedBy=multi-user.target

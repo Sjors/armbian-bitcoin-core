@@ -97,6 +97,8 @@ EOT
   usermod -a -G debian-tor bitcoin
 EOF
 
+cp /tmp/overlay/scripts/first_boot.service /etc/systemd/system
+systemctl enable first_boot.service
 if [ "$BUILD_DESKTOP" == "yes" ]; then
   # Bitcoin desktop background and icon:
   sudo -s <<'EOF'
