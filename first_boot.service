@@ -7,6 +7,8 @@ ExecStart=/usr/bin/timedatectl set-timezone UTC
 ExecStartPost=/usr/sbin/locale-gen en_US.UTF-8
 ExecStartPost=/usr/bin/localectl set-locale LANG=en_US.utf8
 ExecStartPost=/bin/systemctl disable first_boot.service
+ExecStartPost=/usr/bin/passwd -l root
+ExecStartPost=/usr/bin/passwd -e bitcoin
 
 [Install]
 WantedBy=multi-user.target

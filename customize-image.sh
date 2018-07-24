@@ -116,11 +116,3 @@ if [ "$BUILD_DESKTOP" == "yes" ]; then
     systemctl enable first_boot_desktop.service
 EOF
 fi
-
-sudo -s <<'EOF'  
-  # Disable root login
-  passwd -l root
-  
-  # Require password reset:
-  passwd -e bitcoin
-EOF
