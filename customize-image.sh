@@ -35,11 +35,7 @@ sudo -s <<'EOF'
   # TODO: check signature commit hash
 EOF
 
-
-if [ -f /tmp/overlay/bin/bitcoind ]; then
-# Install Bitcoin Core
-  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
-elif [ "$BUILD_DESKTOP" == "yes" ]; then
+if [ "$BUILD_DESKTOP" == "yes" ]; then
   sudo -s <<'EOF'
     sudo add-apt-repository ppa:bitcoin/bitcoin
     sudo apt-get update
@@ -47,7 +43,16 @@ elif [ "$BUILD_DESKTOP" == "yes" ]; then
     # apt enters a confused state, perform incantation and try again:
     sudo apt-get -y -f install
     sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
+EOF
+fi
 
+if [ -f /tmp/overlay/bin/bitcoind ]; then
+  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
+  if [ -f /tmp/overlay/bin/bitcoin-qt ] && [ "$BUILD_DESKTOP" == "yes" ]; then
+    sudo cp /tmp/overlay/bin/bitcoin-qt /usr/local/bin
+  fi
+elif [ "$BUILD_DESKTOP" == "yes" ]; then
+  sudo -s <<'EOF'
     cd /usr/local/src/bitcoin
     ./autogen.sh
     if ! ./configure --disable-tests --disable-bench --with-qrencode --with-gui=qt5 ; then
@@ -99,6 +104,7 @@ EOF
 
 cp /tmp/overlay/scripts/first_boot.service /etc/systemd/system
 systemctl enable first_boot.service
+
 if [ "$BUILD_DESKTOP" == "yes" ]; then
   # Bitcoin desktop background and icon:
   sudo -s <<'EOF'

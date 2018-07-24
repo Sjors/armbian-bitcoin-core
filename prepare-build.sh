@@ -231,10 +231,15 @@ mkdir -p build/userpatches/overlay/bitcoin
 cp armbian-bitcoin-core/bitcoin.conf build/userpatches/overlay/bitcoin
 echo "lang=$LOCALE" >> build/userpatches/overlay/bitcoin/bitcoin.conf
 
-# Copy bitcoind to the right place, if cross compiled:
+# Copy bitcoind to the right place, if cross compiled or if pre-built:
 
 if [ "$GUI" -eq "0" ]; then
   cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
+elif [ "$PREBUILT_BITCOIN_CORE" -eq "1" ]; then
+  cp src/bitcoin/src/bitcoind src/bitcoin/src/bitcoin-cli build/userpatches/overlay/bin
+  if [ "$GUI" -eq "1" ]; then
+    cp src/bitcoin/src/qt/bitcoin-qt build/userpatches/overlay/bin
+  fi
 fi
 
 # Copy block index and chainstate:
