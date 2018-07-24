@@ -3,10 +3,9 @@ Description=Desktop related modifications for first boot
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/dpkg-reconfigure lightdm
-ExecStartPost=/bin/systemctl disable first_boot_desktop.service
+ExecStart=/bin/systemctl disable first_boot_desktop.service
 # Too early:
 # DISPLAY=:0 xfconf-query -c xfwm4 --property /general/workspace_count --set 1
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target

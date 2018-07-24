@@ -9,6 +9,8 @@ ExecStartPost=/usr/bin/localectl set-locale LANG=en_US.utf8
 ExecStartPost=/bin/systemctl disable first_boot.service
 ExecStartPost=/usr/bin/passwd -l root
 ExecStartPost=/usr/bin/passwd -e bitcoin
+# Locale change requires reboot:
+ExecStartPost=/sbin/reboot
 
 [Install]
 WantedBy=multi-user.target
