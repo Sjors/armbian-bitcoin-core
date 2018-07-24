@@ -102,6 +102,9 @@ systemctl enable first_boot.service
 if [ "$BUILD_DESKTOP" == "yes" ]; then
   # Bitcoin desktop background and icon:
   sudo -s <<'EOF'
+    apt remove -y nodm
+    apt-get install -y lightdm lightdm-gtk-greeter xfce4
+  
     cp /tmp/overlay/rocket.jpg /usr/share/backgrounds/xfce/rocket.jpg
     mkdir -p /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml
     cp /tmp/overlay/xfce4-desktop.xml /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
