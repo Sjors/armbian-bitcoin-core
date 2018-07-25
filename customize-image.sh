@@ -85,7 +85,11 @@ EOF
 
 # Install Tor
 sudo -s <<'EOF'
-  su - bitcoin -c "gpg --keyserver pgp.mit.edu --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89"
+  if ! su - bitcoin -c "gpg --keyserver pgp.surfnet.nl --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89" ; then
+    if ! su - bitcoin -c "gpg --keyserver pgp.mit.edu --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89" ; then
+      exit 1
+    fi
+  fi
   su - bitcoin -c "gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89" | apt-key add -
 cat <<EOT >> /etc/apt/sources.list
 deb https://deb.torproject.org/torproject.org bionic main
