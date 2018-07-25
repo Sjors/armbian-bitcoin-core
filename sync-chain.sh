@@ -1,4 +1,12 @@
 #!/bin/bash
+
+echo "Mount shared drive if needed..."
+if ! df -h | grep /shared ; then
+  export USER_ID=`id -u`
+  export GROUP_ID=`id -g`
+  sudo mount -t vboxsf -o umask=0022,gid=$GROUP_ID,uid=$USER_ID shared ~/shared
+fi
+
 if ! which bitcoind ; then
   if [ ! -d src/bitcoin-local ]; then
     echo "Installing Bitcoin Core on this VM..."
@@ -33,7 +41,7 @@ do
       echo "Pruning to height $BLOCKHEIGHT..."
       bitcoin-cli $OPTS pruneblockchain $BLOCKHEIGHT
       bitcoin-cli $OPTS stop
-      while sleep 10 
+      while sleep 10
       do # Wait for shutdown
         if [ ! -f ~/.bitcoin/bitcoind.pid ] && [ ! -f ~/.bitcoin/testnet3/bitcoind.pid ]; then
           break
