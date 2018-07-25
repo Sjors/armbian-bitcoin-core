@@ -18,7 +18,7 @@ BUILD_DESKTOP=$4
 
 # TODO: exit with non-zero status if anything goes wrong
 
-sudo -s <<'EOF'  
+sudo -s <<'EOF'
   # User with sudo rights and initial password:
   useradd bitcoin -m -s /bin/bash --groups sudo
   echo "bitcoin:bitcoin" | chpasswd
@@ -68,7 +68,7 @@ sudo -s <<'EOF'
   mkdir /home/bitcoin/.bitcoin
   mkdir /home/bitcoin/.bitcoin/wallets
   cp /tmp/overlay/bitcoin/bitcoin.conf /home/bitcoin/.bitcoin
-  
+
   # TODO: offer choice between mainnet and testnet
   # echo "testnet=1" >> /home/bitcoin/.bitcoin/bitcoin.conf
   # mkdir /home/bitcoin/.bitcoin/testnet3
@@ -76,7 +76,7 @@ sudo -s <<'EOF'
   # Copy block index and chain state from host:
   cp -r /tmp/overlay/bitcoin/chainstate /home/bitcoin/.bitcoin
   cp -r /tmp/overlay/bitcoin/blocks /home/bitcoin/.bitcoin
-  
+
   # cp -r /tmp/overlay/bitcoin/testnet3/chainstate /home/bitcoin/.bitcoin/testnet3
   # cp -r /tmp/overlay/bitcoin/testnet3/blocks /home/bitcoin/.bitcoin/testnet3
 
@@ -109,16 +109,19 @@ if [ "$BUILD_DESKTOP" == "yes" ]; then
   # Bitcoin desktop background and icon:
   sudo -s <<'EOF'
     apt remove -y nodm
-    apt-get install -y lightdm lightdm-gtk-greeter xfce4
-  
+    apt-get install -y lightdm lightdm-gtk-greeter xfce4 onboard
+
     cp /tmp/overlay/rocket.jpg /usr/share/backgrounds/xfce/rocket.jpg
     mkdir -p /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml
     cp /tmp/overlay/xfce4-desktop.xml /home/bitcoin/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
     cp /tmp/overlay/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
     mkdir -p /home/bitcoin/Desktop
+    mkdir -p /home/bitcoin/.config/autostart
     cp /usr/local/src/bitcoin/contrib/debian/bitcoin-qt.desktop /home/bitcoin/Desktop
     chmod +x /home/bitcoin/Desktop/bitcoin-qt.desktop
+    cp /tmp/overlay/keyboard.desktop /home/bitcoin/.config/autostart
     chown -R bitcoin:bitcoin /home/bitcoin/Desktop
+    chown -R bitcoin:bitcoin /home/bitcoin/.config
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin128.png /usr/share/pixmaps
     cp /usr/local/src/bitcoin/share/pixmaps/bitcoin256.png /usr/share/pixmaps
     cp /tmp/overlay/scripts/first_boot_desktop.service /etc/systemd/system

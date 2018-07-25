@@ -180,7 +180,7 @@ fi
 if [ "$GUI" -eq "0" ]; then
   echo "Check if bitcoin binaries are present..."
   FILES="bitcoin-cli bitcoind"
-  
+
   for f in $FILES;
   do
     if [ ! -f src/bitcoin/src/$f ]; then
@@ -217,11 +217,12 @@ if [ "$GUI" -eq "1" ]; then
   cp armbian-bitcoin-core/rocket.jpg build/userpatches/overlay
   cp armbian-bitcoin-core/xfce4-desktop.xml build/userpatches/overlay
   cp armbian-bitcoin-core/lightdm-gtk-greeter.conf build/userpatches/overlay
+  cp armbian-bitcoin-core/keyboard.desktop build/userpatches/overlay
 fi
 
 if [ "$LIGHTNING" == "c" ]; then
   echo 'PACKAGE_LIST_ADDITIONAL="$PACKAGE_LIST_ADDITIONAL autoconf libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev"' >> build/userpatches/lib.config
-  
+
   echo "./tmp/overlay/scripts/build-c-lightning.sh" >> build/userpatches/customize-image.sh
 fi
 
