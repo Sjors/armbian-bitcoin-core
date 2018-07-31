@@ -50,7 +50,7 @@ for installing the VM, which some changes:
 * you can skip the Network Tab section, but
   * you should become familiar with SSH anyhow
   * Ubuntu doesn't enable SSH by default, so type `sudo apt-get install shh` after installation
-* the Ubuntu installer is pretty similar to the Debian one shown on that page (when in doubt, press enter) 
+* the Ubuntu installer is pretty similar to the Debian one shown on that page (when in doubt, press enter)
   * it skips the root user stuff, so you just need to create a single password
 
 Go to the settings page of
@@ -88,10 +88,10 @@ Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag
 To build Bitcoin Core 0.16 without GUI, for a 32 bit device and with lightning:
 
 ```sh
-./armbian-bitcoin-core/previous_release.sh -b 32 -l c v0.16.1
+./armbian-bitcoin-core/previous_release.sh -b 32 -l c v0.16.2
 ```
 
-After some initial work, it will ask you to select your board. Select 
+After some initial work, it will ask you to select your board. Select
 Mainline for the kernel.
 
 Sit back and wait... If all goes well, it should output something like:
@@ -153,7 +153,7 @@ Host pi-wifi
 The device has eMMC storage which is faster than the microSD card, and you may
 want to be able to use the card.
 
-To copy it over: 
+To copy it over:
 
 ```sh
 sudo nand-sata-install

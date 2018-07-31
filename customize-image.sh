@@ -31,7 +31,7 @@ EOF
 sudo -s <<'EOF'
   git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
   cd /usr/local/src/bitcoin
-  git checkout v0.16.1
+  git checkout v0.16.2
   # TODO: check signature commit hash
 EOF
 
