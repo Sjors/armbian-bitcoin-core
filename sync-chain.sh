@@ -12,7 +12,7 @@ if ! which bitcoind ; then
     echo "Installing Bitcoin Core on this VM..."
     git clone https://github.com/bitcoin/bitcoin.git src/bitcoin-local
     pushd src/bitcoin-local
-      git checkout v0.16.2
+      git checkout v0.16.3
       # TODO: check git hash
       ./autogen.sh
       ./configure --disable-tests --disable-bench --disable-wallet --without-gui

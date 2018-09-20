@@ -88,8 +88,8 @@ Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag
 To build Bitcoin Core 0.16 without GUI, for a 32 bit device and with lightning:
 
 ```sh
-./armbian-bitcoin-core/previous_release.sh -b 32 -l c v0.16.2
-```
+./armbian-bitcoin-core/prepare_build.sh -b 32 -l c v0.16.3
+``
 
 After some initial work, it will ask you to select your board. Select
 Mainline for the kernel.
