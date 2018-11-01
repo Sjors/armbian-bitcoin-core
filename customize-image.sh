@@ -27,40 +27,19 @@ EOF
 
 # TODO copy ssh pubkey if found, disable password SSH login
 
-# Clone Bitcoin Core repo for graphics assets and (if needed) compilation:
+# Clone Bitcoin Core repo for graphics assets:
 sudo -s <<'EOF'
   git clone https://github.com/bitcoin/bitcoin.git /usr/local/src/bitcoin
   cd /usr/local/src/bitcoin
-  git checkout v0.16.3
+  git checkout v0.17.0
   # TODO: check signature commit hash
+
+  git clone https://github.com/bitcoin-core/packaging.git /usr/local/src/packaging
 EOF
 
+sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
 if [ "$BUILD_DESKTOP" == "yes" ]; then
-  sudo -s <<'EOF'
-    sudo add-apt-repository ppa:bitcoin/bitcoin
-    sudo apt-get update
-    sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
-    # apt enters a confused state, perform incantation and try again:
-    sudo apt-get -y -f install
-    sudo apt-get install -y libdb4.8-dev libdb4.8++-dev
-EOF
-fi
-
-if [ -f /tmp/overlay/bin/bitcoind ]; then
-  sudo cp /tmp/overlay/bin/bitcoin* /usr/local/bin
-  if [ -f /tmp/overlay/bin/bitcoin-qt ] && [ "$BUILD_DESKTOP" == "yes" ]; then
-    sudo cp /tmp/overlay/bin/bitcoin-qt /usr/local/bin
-  fi
-elif [ "$BUILD_DESKTOP" == "yes" ]; then
-  sudo -s <<'EOF'
-    cd /usr/local/src/bitcoin
-    ./autogen.sh
-    if ! ./configure --disable-tests --disable-bench --with-qrencode --with-gui=qt5 ; then
-      exit 1
-    fi
-    make
-    make install
-EOF
+  sudo cp /tmp/overlay/bin/bitcoin-qt /usr/local/bin
 fi
 
 # Configure Bitcoin Core:
@@ -121,7 +100,7 @@ if [ "$BUILD_DESKTOP" == "yes" ]; then
     cp /tmp/overlay/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
     mkdir -p /home/bitcoin/Desktop
     mkdir -p /home/bitcoin/.config/autostart
-    cp /usr/local/src/bitcoin/contrib/debian/bitcoin-qt.desktop /home/bitcoin/Desktop
+    cp /usr/local/src/packaging/debian/bitcoin-qt.desktop /home/bitcoin/Desktop
     chmod +x /home/bitcoin/Desktop/bitcoin-qt.desktop
     cp /tmp/overlay/keyboard.desktop /home/bitcoin/.config/autostart
     chown -R bitcoin:bitcoin /home/bitcoin/Desktop

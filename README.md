@@ -85,10 +85,10 @@ Usage: ./armbian-bitcoin-core/prepare-build.sh -b 32 [options] tag
   -u     Ubuntu release: bionic (18.04, default), xenial (16.04)
 ```
 
-To build Bitcoin Core 0.16 without GUI, for a 32 bit device and with lightning:
+To build Bitcoin Core 0.17 without GUI, for a 32 bit device and with lightning:
 
 ```sh
-./armbian-bitcoin-core/prepare_build.sh -b 32 -l c v0.16.3
+./armbian-bitcoin-core/prepare_build.sh -b 32 -l c v0.17.0
 ``
 
 After some initial work, it will ask you to select your board. Select
